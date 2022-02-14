@@ -19,8 +19,8 @@ finalize_purrr_progress = function(x){
 	return(x)
 }
 
-generate_mod = cmdstan_model('pvgp_generate.stan')
-sample_mod = cmdstan_model('pvgp_sample.stan')
+generate_mod = cmdstan_model('stan/pvgp_generate.stan')
+sample_mod = cmdstan_model('stan/pvgp_sample.stan')
 
 f = function(z){
 	if(!is.null(all_out)){

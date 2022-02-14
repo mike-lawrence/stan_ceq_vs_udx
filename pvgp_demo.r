@@ -9,7 +9,7 @@ n = 2^5 #bigger n will take longer; 2^7 takes about 90s on a reasonably modern c
 #x can be anything (doesn't have to be on a grid)
 x = 1:n
 # x = sort(runif(n,0,1))
-generate_mod = cmdstan_model('pvgp_generate.stan',force_recompile = T)
+generate_mod = cmdstan_model('stan/pvgp_generate.stan',force_recompile = T)
 generated = generate_mod$generate_quantities(
 	data = lst(
 		n = n
@@ -84,7 +84,7 @@ data_for_stan = lst(
 glimpse(data_for_stan)
 
 #sample
-sample_mod = cmdstan_model('pvgp_sample.stan',force_recompile=T)
+sample_mod = cmdstan_model('stan/pvgp_sample.stan',force_recompile=T)
 sampled = sample_mod$sample(
 	data = data_for_stan
 	, chains = parallel::detectCores()/2
