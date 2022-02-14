@@ -1,26 +1,5 @@
 functions{
-	matrix gp_exp_quad_cov_from_udx(
-		real eta
-		, real rho
-		, real jitter
-		, int n_x
-		, int square_n_x
-		, int n_udx
-		, vector udx
-		, int[] i_uk_k_ut
-		, int[] i_uk_k_lt
-		, int[] i_k_diag
-		, int[] i_k_ut
-		, int[] i_k_lt
-	){
-		real sq_eta = square( eta ) ;
-		vector[n_udx] uk = sq_eta * exp( udx / square(rho) ) ;
-		vector[square_n_x] k_flat ;
-		k_flat[i_k_diag] = rep_vector(sq_eta + jitter,n_x) ;
-		k_flat[i_k_ut] = uk[i_uk_k_ut] ;
-		k_flat[i_k_lt] = uk[i_uk_k_lt] ;
-		return to_matrix(k_flat,n_x,n_x) ;
-	}
+
 	matrix unit_gp_exp_quad_cov_from_udx(
 		real rho
 		, real jitter
@@ -43,6 +22,7 @@ functions{
 	}
 
 }
+
 data{
 
 	// n_xy: number of observations
@@ -75,7 +55,9 @@ data{
 
 
 }
+
 transformed data{
+
 	int square_n_xy = n_xy*n_xy ;
 
 	// pre-compute some quantities:
@@ -101,8 +83,11 @@ transformed data{
 		}
 	}
 	real dist_range = max_dist - min_dist ;
+
 }
+
 parameters{
+
 	// logit_pvn: logit proportion of variance attributable to noise
 	real logit_pvn ;
 	// logit_p_lengthscale: logit-transformed GP lengthscale, expressed as as a
@@ -110,8 +95,11 @@ parameters{
 	real logit_p_lengthscale ;
 	// helper variable for the GP that will be given a std_normal prior
 	vector[n_xy] f_stdnormal ;
+
 }
+
 transformed parameters{
+
 	real pvn ;
 	real lengthscale ;
 	profile("tp"){
@@ -127,7 +115,6 @@ transformed parameters{
 		// cov_mat: covariance matrix for the GP, using the standard "exponentiated quadratic" kernel
 		matrix[n_xy,n_xy] k_eqc ;
 		matrix[n_xy,n_xy] k_udx ;
-		matrix[n_xy,n_xy] k_uudx ;
 		profile("eqc"){
 			k_eqc = add_diag(
 				gp_exp_quad_cov(x,1.0,lengthscale)
@@ -150,21 +137,6 @@ transformed parameters{
 			) ;
 		}
 		delta = max(square(k_eqc-k_udx));
-		profile("uudx"){
-			k_uudx = unit_gp_exp_quad_cov_from_udx(
-				lengthscale // real rho
-				, 1e-5 // real jitter
-				, n_xy // int n_x
-				, square_n_xy // int square_n_x
-				, n_udx // int n_udx
-				, udx // vector udx
-				, i_uk_k_ut // int i_uk_k_ut[]
-				, i_uk_k_lt // int i_uk_k_lt[]
-				, i_k_diag // int i_k_diag[]
-				, i_k_ut // int i_k_ut[]
-				, i_k_lt // int i_k_lt[]
-			) ;
-		}
 		// compute f_ as the product of the cholesky-decomposed correlations and
 		//   the standard-normal variate, yielding a set of values that vary smoothly
 		//   as a function of x. Final multiplication by sqrt(1-pvn) pairs with
@@ -178,8 +150,11 @@ transformed parameters{
 			) ;
 		}
 	}
+
 }
+
 model{
+
 	profile("model"){
 		// Prior on logit_p-lengthscale peaked at 0 implies credibility peaked at
 		//   the middle of the range on which the data can inform. A SD of 1 implies
@@ -202,8 +177,12 @@ model{
 		// "Likelihood" whereby y_ is centered on f_ with an SD of sqrt(pvn)
 		y_ ~ normal(f_,sqrt(pvn)) ;
 	}
+
 }
+
 generated quantities{
+
 	// f: (unscaled) latent GP
 	vector[n_xy] f = f_*obs_y_sd + obs_y_mean ;
+
 }
