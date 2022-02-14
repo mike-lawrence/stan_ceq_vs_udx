@@ -52,7 +52,7 @@ generated quantities{
 	{
 		vector[n] f_stdnormal ;
 		vector[n] noise_stdnormal ;
-		matrix[n,n] cov_mat = cov_exp_quad(x,1.0,lengthscale) ;
+		matrix[n,n] cov_mat = gp_exp_quad_cov(x,1.0,lengthscale) ;
 		for(i_n in 1:n){
 			cov_mat[i_n,i_n] += 1e-5 ;
 			f_stdnormal[i_n] = std_normal_rng() ;
