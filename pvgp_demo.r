@@ -105,18 +105,12 @@ p = sampled$profiles()
 	)
 )
 
-#check errors
-(
-	c('err1','err2')
-	%>% sampled$draws(format='draws_list')
-	%>% posterior::as_draws_rvars()
-)
-
-
-
-
 #check diagnostics
 sampled$cmdstan_diagnose()
+
+#check that delta is small
+sampled$draws('delta',format='rvars')
+
 
 #check summary of hyperparameters
 sampled$summary(variables=c('pvn','lengthscale'))

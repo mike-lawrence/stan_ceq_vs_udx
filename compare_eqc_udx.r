@@ -6,8 +6,10 @@ library(ggfan)
 library(cowplot)
 initialize_purrr_progress = function(x){
 	.pp <<- progress::progress_bar$new(
-		format = "[:bar] :percent"# eta: :eta",
-		total = length(x), clear = FALSE, width= 60
+		format = "[:bar] :percent eta: :eta"
+		, total = length(x)
+		, clear = FALSE
+		, width= 60
 	)
 	return(x)
 }
